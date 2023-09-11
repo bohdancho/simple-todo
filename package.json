@@ -24,6 +24,7 @@
     "typescript": "5.2.2"
   },
   "devDependencies": {
+    "daisyui": "^3.7.3",
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.4",
     "prisma": "^5.2.0"
