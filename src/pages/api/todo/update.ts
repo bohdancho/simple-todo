@@ -4,7 +4,6 @@ import { prisma } from '~/utils/prisma'
 
 const paramsValidator = z.object({ id: z.string() })
 const payloadValidator = z.object({ completed: z.boolean() })
-export type UpdateTodoParams = z.infer<typeof paramsValidator>
 export type UpdateTodoPayload = z.infer<typeof payloadValidator>
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { prisma } from '~/utils/prisma'
 
 const createTodoValidator = z.object({ text: z.string() })
-export type CreateTodoRequest = z.infer<typeof createTodoValidator>
+export type CreateTodoPayload = z.infer<typeof createTodoValidator>
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {

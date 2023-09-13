@@ -1,37 +1,31 @@
 import { Todo } from '@prisma/client'
 import { FunctionComponent, useEffect, useState } from 'react'
-import { CreateTodoRequest } from '~/pages/api/todo/create'
+import { CreateTodoPayload } from '~/pages/api/todo/create'
 import { GetTodosResponse } from '~/pages/api/todo/getAll'
 import { UpdateTodoPayload } from '~/pages/api/todo/update'
 import { TodoItem } from './TodoItem'
 
 interface TodoListProps {}
-
 const TodoList: FunctionComponent<TodoListProps> = () => {
-  const [todos, setTodos] = useState<null | GetTodosResponse>(null)
+  const [todos, setTodos] = useState<null | Todo[]>(null)
   const [newText, setNewText] = useState('')
 
   useEffect(() => {
-    fetch('/api/todo/getAll')
-      .then((res) => res.json())
-      .then((data) => setTodos(data))
+    getTodos().then((response) => setTodos(response))
   }, [])
 
-  const create = () => {
-    const payload: CreateTodoRequest = { text: newText }
+  const createHandler = () => {
+    const payload: CreateTodoPayload = { text: newText }
     const fakeId = Math.random()
     const optimisticTodo = { ...payload, id: fakeId, completed: false }
+    const optimisticUpdate = () => setTodos((prev) => prev && [...prev, optimisticTodo])
     const revertOptimistic = () => setTodos((prev) => prev && prev.filter((todo) => todo.id !== fakeId))
 
-    setTodos((prev) => prev && [...prev, optimisticTodo])
-    fetch('/api/todo/create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }).then(undefined, revertOptimistic)
+    optimisticUpdate()
+    createTodo(payload).catch(revertOptimistic)
   }
 
-  const updateCompleted = ({ completed, id }: Todo) => {
+  const updateHandler = ({ completed, id }: Todo) => {
     const payload: UpdateTodoPayload = { completed: !completed }
     const oldValue = completed
     const optimisticUpdate = () =>
@@ -42,18 +36,14 @@ const TodoList: FunctionComponent<TodoListProps> = () => {
       setTodos((prev) => prev && prev.map((todo) => (todo.id === id ? { ...todo, completed: oldValue } : todo)))
 
     optimisticUpdate()
-    fetch('/api/todo/update?id=' + id, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    }).then(undefined, revertOptimistic)
+    updateTodo(payload, id).catch(revertOptimistic)
   }
 
   return (
     <div>
       <h1 className='mb-5 text-5xl'>Your list of todos</h1>
       <div>
-        <button type='button' className='btn mb-3' onClick={create}>
+        <button type='button' className='btn mb-3' onClick={createHandler}>
           create new todo
         </button>
         <input
@@ -71,7 +61,7 @@ const TodoList: FunctionComponent<TodoListProps> = () => {
                 <TodoItem
                   text={todo.text}
                   completed={todo.completed}
-                  toggleCompleted={() => updateCompleted(todo)}
+                  toggleCompleted={() => updateHandler(todo)}
                   key={todo.id}
                 />
               ))
@@ -79,6 +69,26 @@ const TodoList: FunctionComponent<TodoListProps> = () => {
       </div>
     </div>
   )
+}
+
+function getTodos(): Promise<GetTodosResponse> {
+  return fetch('/api/todo/getAll').then((res) => res.json())
+}
+
+function createTodo(payload: CreateTodoPayload) {
+  return fetch('/api/todo/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+}
+
+function updateTodo(payload: UpdateTodoPayload, id: number) {
+  return fetch('/api/todo/update?id=' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
 }
 
 function sortById(a: Todo, b: Todo) {
