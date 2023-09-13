@@ -1,6 +1,6 @@
 import { Todo } from '@prisma/client'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { prisma } from '~/pages/utils/prisma'
+import { prisma } from '~/utils/prisma'
 
 export type GetTodosResponse = Todo[]
 

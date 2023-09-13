@@ -1,14 +1,9 @@
-import { Todo } from '@prisma/client'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
-import { prisma } from '~/pages/utils/prisma'
+import { prisma } from '~/utils/prisma'
 
 const createTodoValidator = z.object({ text: z.string() })
 export type CreateTodoRequest = z.infer<typeof createTodoValidator>
-export interface CreateTodoResponse {
-  error?: string
-  data: Todo
-}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
