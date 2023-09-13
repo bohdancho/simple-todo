@@ -1,6 +1,6 @@
 import { Todo } from '@prisma/client'
 import { FunctionComponent, useEffect, useState } from 'react'
-import { CreateTodoPayload } from '~/pages/api/todo/create'
+import { CreateTodoPayload, CreateTodoResponse } from '~/pages/api/todo/create'
 import { GetTodosResponse } from '~/pages/api/todo/getAll'
 import { UpdateTodoPayload } from '~/pages/api/todo/update'
 import { TodoItem } from './TodoItem'
@@ -19,10 +19,14 @@ const TodoList: FunctionComponent<TodoListProps> = () => {
     const fakeId = Math.random()
     const optimisticTodo = { ...payload, id: fakeId, completed: false }
     const optimisticUpdate = () => setTodos((prev) => prev && [...prev, optimisticTodo])
+    const fixOptimisticId = (realId: number) =>
+      setTodos((prev) => prev && prev.map((todo) => (todo.id === fakeId ? { ...todo, id: realId } : todo)))
     const revertOptimistic = () => setTodos((prev) => prev && prev.filter((todo) => todo.id !== fakeId))
 
     optimisticUpdate()
-    createTodo(payload).catch(revertOptimistic)
+    createTodo(payload)
+      .then(({ id }) => fixOptimisticId(id))
+      .catch(revertOptimistic)
   }
 
   const updateHandler = ({ completed, id }: Todo) => {
@@ -39,6 +43,20 @@ const TodoList: FunctionComponent<TodoListProps> = () => {
     updateTodo(payload, id).catch(revertOptimistic)
   }
 
+  const deleteHandler = (todo: Todo) => {
+    const optimisticDelete = () =>
+      setTodos((prev) => {
+        return prev && prev.filter(({ id }) => id !== todo.id)
+      })
+    const revertOptimistic = () =>
+      setTodos((prev) => {
+        return prev && [...prev, todo]
+      })
+
+    optimisticDelete()
+    deleteTodo(todo.id).catch(revertOptimistic)
+  }
+
   return (
     <div>
       <h1 className='mb-5 text-5xl'>Your list of todos</h1>
@@ -51,6 +69,7 @@ const TodoList: FunctionComponent<TodoListProps> = () => {
           className='input border-2 border-slate-800'
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
+          onKeyDown={(e) => (e.key === 'Enter' ? createHandler() : null)}
         />
       </div>
       <div className='flex flex-col gap-1'>
@@ -62,6 +81,7 @@ const TodoList: FunctionComponent<TodoListProps> = () => {
                   text={todo.text}
                   completed={todo.completed}
                   toggleCompleted={() => updateHandler(todo)}
+                  onDelete={() => deleteHandler(todo)}
                   key={todo.id}
                 />
               ))
@@ -71,24 +91,30 @@ const TodoList: FunctionComponent<TodoListProps> = () => {
   )
 }
 
+const API_PREFIX = '/api/todo/'
+
 function getTodos(): Promise<GetTodosResponse> {
-  return fetch('/api/todo/getAll').then((res) => res.json())
+  return fetch(API_PREFIX + '/getAll').then((res) => res.json())
 }
 
-function createTodo(payload: CreateTodoPayload) {
-  return fetch('/api/todo/create', {
+function createTodo(payload: CreateTodoPayload): Promise<CreateTodoResponse> {
+  return fetch(API_PREFIX + '/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
-  })
+  }).then((res) => res.json())
 }
 
 function updateTodo(payload: UpdateTodoPayload, id: number) {
-  return fetch('/api/todo/update?id=' + id, {
+  return fetch(API_PREFIX + '/update?id=' + id, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
+}
+
+function deleteTodo(id: number) {
+  return fetch(API_PREFIX + '/delete?id=' + id, { method: 'DELETE' })
 }
 
 function sortById(a: Todo, b: Todo) {
