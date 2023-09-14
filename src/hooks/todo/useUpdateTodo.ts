@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { API_PREFIX_TODO } from '~/constants'
+import { API_PREFIX_TODO, TODO_QUERY_KEY } from '~/constants'
 import { queryClient } from '~/pages'
 import { GetTodosResponse } from '~/pages/api/todo/getAll'
 import { UpdateTodoPayload } from '~/pages/api/todo/update'
@@ -16,17 +16,17 @@ export const useUpdateTodo = () =>
   useMutation({
     mutationFn: updateTodo,
     onMutate: async ({ id, payload }) => {
-      await queryClient.cancelQueries({ queryKey: ['todos'] })
-      const previousTodos = queryClient.getQueryData(['todos'])
+      await queryClient.cancelQueries({ queryKey: [TODO_QUERY_KEY] })
+      const previousTodos = queryClient.getQueryData([TODO_QUERY_KEY])
 
       queryClient.setQueryData<GetTodosResponse>(
-        ['todos'],
+        [TODO_QUERY_KEY],
         (old) => old?.map((todo) => (todo.id === id ? { ...todo, ...payload } : todo)),
       )
       return { previousTodos }
     },
     onError: (_err, _newTodo, context) => {
-      queryClient.setQueryData(['todos'], context && context.previousTodos)
+      queryClient.setQueryData([TODO_QUERY_KEY], context && context.previousTodos)
     },
-    onSuccess: () => queryClient.invalidateQueries(['todos']),
+    onSuccess: () => queryClient.invalidateQueries([TODO_QUERY_KEY]),
   })
