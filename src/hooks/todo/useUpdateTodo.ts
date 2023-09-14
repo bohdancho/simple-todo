@@ -1,11 +1,11 @@
 import { Todo } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
-import { API_PREFIX } from '~/components/todo'
+import { API_PREFIX_TODO } from '~/constants'
 import { queryClient } from '~/pages'
 import { UpdateTodoPayload } from '~/pages/api/todo/update'
 
 function updateTodo({ payload, id }: { payload: UpdateTodoPayload; id: number }) {
-  return fetch(API_PREFIX + '/update?id=' + id, {
+  return fetch(API_PREFIX_TODO + '/update?id=' + id, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

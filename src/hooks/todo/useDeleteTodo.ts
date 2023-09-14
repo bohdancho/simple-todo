@@ -1,10 +1,10 @@
 import { Todo } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
-import { API_PREFIX } from '~/components/todo'
+import { API_PREFIX_TODO } from '~/constants'
 import { queryClient } from '~/pages'
 
 function deleteTodo({ id }: { id: number }) {
-  return fetch(API_PREFIX + '/delete?id=' + id, { method: 'DELETE' })
+  return fetch(API_PREFIX_TODO + '/delete?id=' + id, { method: 'DELETE' })
 }
 
 export const useDeleteTodo = () =>

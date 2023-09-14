@@ -1,12 +1,12 @@
 import { Todo } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
-import { API_PREFIX } from '~/components/todo/TodoList'
+import { API_PREFIX_TODO } from '~/constants/apiPrefixes'
 import { queryClient } from '~/pages'
 import { CreateTodoPayload, CreateTodoResponse } from '~/pages/api/todo/create'
 import { fakeId } from '~/utils/fakeId'
 
 function createTodo(payload: CreateTodoPayload): Promise<CreateTodoResponse> {
-  return fetch(API_PREFIX + '/create', {
+  return fetch(API_PREFIX_TODO + '/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

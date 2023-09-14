@@ -28,8 +28,6 @@ export const TodoList: FunctionComponent<TodoListProps> = () => {
   )
 }
 
-export const API_PREFIX = '/api/todo/'
-
 function sortById(a: Todo, b: Todo) {
   return b.id - a.id
 }
