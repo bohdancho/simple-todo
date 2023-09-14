@@ -1,6 +1,6 @@
 import { Todo } from '@prisma/client'
 import { FunctionComponent, useState } from 'react'
-import { useCreateTodo, useGetTodos } from '~/hooks/todo'
+import { useCreateTodo, useDeleteTodo, useGetTodos } from '~/hooks/todo'
 import { CreateTodoPayload, CreateTodoResponse } from '~/pages/api/todo/create'
 import { UpdateTodoPayload } from '~/pages/api/todo/update'
 import { TodoItem } from './TodoItem'
@@ -9,22 +9,9 @@ interface TodoListProps {}
 export const TodoList: FunctionComponent<TodoListProps> = () => {
   const [newText, setNewText] = useState('')
 
-  const { todos } = useGetTodos()
-
+  const { data: todos } = useGetTodos()
   const { mutate: createTodo } = useCreateTodo()
-  // const createHandler = () => {
-  // const payload: CreateTodoPayload = { text: newText }
-  // const fakeId = Math.random()
-  // const optimisticTodo = { ...payload, id: fakeId, completed: false }
-  // const optimisticUpdate = () => setTodos((prev) => prev && [...prev, optimisticTodo])
-  // const fixOptimisticId = (realId: number) =>
-  // setTodos((prev) => prev && prev.map((todo) => (todo.id === fakeId ? { ...todo, id: realId } : todo)))
-  // const revertOptimistic = () => setTodos((prev) => prev && prev.filter((todo) => todo.id !== fakeId))
-
-  // createTodo(payload)
-  // .then(({ id }) => fixOptimisticId(id))
-  // .catch(revertOptimistic)
-  // }
+  const { mutate: deleteTodo } = useDeleteTodo()
 
   const updateHandler = ({ completed, id }: Todo) => {}
 
@@ -54,7 +41,7 @@ export const TodoList: FunctionComponent<TodoListProps> = () => {
                   text={todo.text}
                   completed={todo.completed}
                   toggleCompleted={() => updateHandler(todo)}
-                  onDelete={() => deleteHandler(todo)}
+                  onDelete={() => deleteTodo({ id: todo.id })}
                   key={todo.id}
                 />
               ))
