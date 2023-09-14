@@ -1,8 +1,6 @@
 import { Todo } from '@prisma/client'
 import { FunctionComponent, useState } from 'react'
 import { useCreateTodo, useDeleteTodo, useGetTodos, useUpdateTodo } from '~/hooks/todo'
-import { CreateTodoPayload, CreateTodoResponse } from '~/pages/api/todo/create'
-import { UpdateTodoPayload } from '~/pages/api/todo/update'
 import { TodoItem } from './TodoItem'
 
 interface TodoListProps {}
@@ -13,10 +11,6 @@ export const TodoList: FunctionComponent<TodoListProps> = () => {
   const { mutate: createTodo } = useCreateTodo()
   const { mutate: deleteTodo } = useDeleteTodo()
   const { mutate: updateTodo } = useUpdateTodo()
-
-  const updateHandler = ({ completed, id }: Todo) => {}
-
-  const deleteHandler = (todo: Todo) => {}
 
   return (
     <div>
@@ -53,26 +47,6 @@ export const TodoList: FunctionComponent<TodoListProps> = () => {
 }
 
 export const API_PREFIX = '/api/todo/'
-
-function createTodo(payload: CreateTodoPayload): Promise<CreateTodoResponse> {
-  return fetch(API_PREFIX + '/create', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).then((res) => res.json())
-}
-
-function updateTodo(payload: UpdateTodoPayload, id: number) {
-  return fetch(API_PREFIX + '/update?id=' + id, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-}
-
-function deleteTodo(id: number) {
-  return fetch(API_PREFIX + '/delete?id=' + id, { method: 'DELETE' })
-}
 
 function sortById(a: Todo, b: Todo) {
   return b.id - a.id
