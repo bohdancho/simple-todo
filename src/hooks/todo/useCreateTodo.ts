@@ -20,7 +20,7 @@ export const useCreateTodo = () =>
       await queryClient.cancelQueries({ queryKey: [TODO_QUERY_KEY] })
       const previousTodos = queryClient.getQueryData([TODO_QUERY_KEY])
 
-      const optimisticTodo = { ...newTodo, id: fakeId(), completed: false }
+      const optimisticTodo = { ...newTodo, id: fakeId(), createdAt: new Date(), completed: false }
       queryClient.setQueryData<GetTodosResponse>([TODO_QUERY_KEY], (old) => old && [...old, optimisticTodo])
       return { previousTodos }
     },

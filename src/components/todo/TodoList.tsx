@@ -1,4 +1,5 @@
 import { Todo } from '@prisma/client'
+import dayjs from 'dayjs'
 import { FunctionComponent } from 'react'
 import { useDeleteTodo, useGetTodos, useUpdateTodo } from '~/hooks/todo'
 import { TodoItem } from './TodoItem'
@@ -13,7 +14,7 @@ export const TodoList: FunctionComponent<TodoListProps> = () => {
     <div className='flex flex-col gap-1'>
       {todos !== undefined
         ? todos
-            .sort(sortById)
+            .sort(sortByCreated)
             .map(({ id, text, completed }) => (
               <TodoItem
                 text={text}
@@ -28,6 +29,6 @@ export const TodoList: FunctionComponent<TodoListProps> = () => {
   )
 }
 
-function sortById(a: Todo, b: Todo) {
-  return b.id - a.id
+function sortByCreated(a: Todo, b: Todo) {
+  return dayjs(b.createdAt).valueOf() - dayjs(a.createdAt).valueOf()
 }

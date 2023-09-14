@@ -9,8 +9,8 @@ export type CreateTodoResponse = Todo
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<CreateTodoResponse>) {
   try {
-    const request = createTodoValidator.parse(req.body)
-    const todo = await prisma.todo.create({ data: request })
+    const { text } = createTodoValidator.parse(req.body)
+    const todo = await prisma.todo.create({ data: { text } })
     res.status(200).json(todo)
   } catch (error) {
     res.status(400).end()
