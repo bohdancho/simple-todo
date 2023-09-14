@@ -1,7 +1,7 @@
-import { Todo } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
 import { API_PREFIX_TODO } from '~/constants'
 import { queryClient } from '~/pages'
+import { GetTodosResponse } from '~/pages/api/todo/getAll'
 import { UpdateTodoPayload } from '~/pages/api/todo/update'
 
 function updateTodo({ payload, id }: { payload: UpdateTodoPayload; id: number }) {
@@ -19,9 +19,9 @@ export const useUpdateTodo = () =>
       await queryClient.cancelQueries({ queryKey: ['todos'] })
       const previousTodos = queryClient.getQueryData(['todos'])
 
-      queryClient.setQueryData<Todo[]>(
+      queryClient.setQueryData<GetTodosResponse>(
         ['todos'],
-        (old) => old && old.map((todo) => (todo.id === id ? { ...todo, ...payload } : todo)),
+        (old) => old?.map((todo) => (todo.id === id ? { ...todo, ...payload } : todo)),
       )
       return { previousTodos }
     },

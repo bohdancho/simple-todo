@@ -1,8 +1,8 @@
-import { Todo } from '@prisma/client'
 import { useMutation } from '@tanstack/react-query'
 import { API_PREFIX_TODO } from '~/constants/apiPrefixes'
 import { queryClient } from '~/pages'
 import { CreateTodoPayload, CreateTodoResponse } from '~/pages/api/todo/create'
+import { GetTodosResponse } from '~/pages/api/todo/getAll'
 import { fakeId } from '~/utils/fakeId'
 
 function createTodo(payload: CreateTodoPayload): Promise<CreateTodoResponse> {
@@ -21,7 +21,7 @@ export const useCreateTodo = () =>
       const previousTodos = queryClient.getQueryData(['todos'])
 
       const optimisticTodo = { ...newTodo, id: fakeId(), completed: false }
-      queryClient.setQueryData<Todo[]>(['todos'], (old) => old && [...old, optimisticTodo])
+      queryClient.setQueryData<GetTodosResponse>(['todos'], (old) => old && [...old, optimisticTodo])
       return { previousTodos }
     },
     onError: (_err, _newTodo, context) => {
