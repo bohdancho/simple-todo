@@ -1,13 +1,12 @@
 import { Todo } from '@prisma/client'
 import { FunctionComponent, useState } from 'react'
-import { useCreateTodo } from '~/hooks/todo/useCreateTodo'
-import { useGetTodos } from '~/hooks/todo/useGetTodos'
+import { useCreateTodo, useGetTodos } from '~/hooks/todo'
 import { CreateTodoPayload, CreateTodoResponse } from '~/pages/api/todo/create'
 import { UpdateTodoPayload } from '~/pages/api/todo/update'
 import { TodoItem } from './TodoItem'
 
 interface TodoListProps {}
-const TodoList: FunctionComponent<TodoListProps> = () => {
+export const TodoList: FunctionComponent<TodoListProps> = () => {
   const [newText, setNewText] = useState('')
 
   const { todos } = useGetTodos()
@@ -90,5 +89,3 @@ function deleteTodo(id: number) {
 function sortById(a: Todo, b: Todo) {
   return b.id - a.id
 }
-
-export default TodoList

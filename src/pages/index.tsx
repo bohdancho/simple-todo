@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import TodoList from '~/components/todo/TodoList'
+import { TodoList } from '~/components/todo'
 
 export const queryClient = new QueryClient()
 
