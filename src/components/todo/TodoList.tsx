@@ -1,6 +1,6 @@
 import { Todo } from '@prisma/client'
 import { FunctionComponent, useState } from 'react'
-import { useCreateTodo, useDeleteTodo, useGetTodos } from '~/hooks/todo'
+import { useCreateTodo, useDeleteTodo, useGetTodos, useUpdateTodo } from '~/hooks/todo'
 import { CreateTodoPayload, CreateTodoResponse } from '~/pages/api/todo/create'
 import { UpdateTodoPayload } from '~/pages/api/todo/update'
 import { TodoItem } from './TodoItem'
@@ -12,6 +12,7 @@ export const TodoList: FunctionComponent<TodoListProps> = () => {
   const { data: todos } = useGetTodos()
   const { mutate: createTodo } = useCreateTodo()
   const { mutate: deleteTodo } = useDeleteTodo()
+  const { mutate: updateTodo } = useUpdateTodo()
 
   const updateHandler = ({ completed, id }: Todo) => {}
 
@@ -36,13 +37,13 @@ export const TodoList: FunctionComponent<TodoListProps> = () => {
         {todos !== undefined
           ? todos
               .sort(sortById)
-              .map((todo) => (
+              .map(({ id, text, completed }) => (
                 <TodoItem
-                  text={todo.text}
-                  completed={todo.completed}
-                  toggleCompleted={() => updateHandler(todo)}
-                  onDelete={() => deleteTodo({ id: todo.id })}
-                  key={todo.id}
+                  text={text}
+                  completed={completed}
+                  toggleCompleted={() => updateTodo({ payload: { completed: !completed }, id })}
+                  onDelete={() => deleteTodo({ id })}
+                  key={id}
                 />
               ))
           : 'Loading'}
